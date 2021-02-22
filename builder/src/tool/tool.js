@@ -2,6 +2,46 @@ import lodash from 'lodash'
 import parser from 'posthtml-parser'
 import render from 'posthtml-render'
 import JSZip from 'jszip'
+import axios from 'axios'
+import OSS from 'ali-oss'
+
+// 可以自定义为文件名（例如file.txt）或目录（例如abc/test/file.txt）的形式，实现将文件上传至当前Bucket或Bucket下的指定目录。
+
+function upload(fileName = null) {
+	return new Promise((resolve, reject) => {
+		let input = document.createElement('input')
+		input.type = 'file'
+		input.onchange = async e => {
+			let file = e.path[0].files[0]
+			try {
+				let res = await uploadAliOSS(file, fileName)
+				resolve(res)
+			} catch (error) {
+				reject(error)
+			}
+		}
+		input.click()
+	})
+}
+
+async function uploadAliOSS(file, fileName = null) {
+	const { data: credentials } = await axios.get(process.env.VUE_APP_URL + '/sts')
+	const { name: originFileName } = file
+	const ext = originFileName.match(/\..*/)[0]
+	const client = new OSS({
+		accessKeyId: credentials.AccessKeyId,
+		accessKeySecret: credentials.AccessKeySecret,
+		stsToken: credentials.SecurityToken,
+		region: credentials.aliOSS_region,
+		bucket: credentials.aliOSS_bucket,
+	})
+
+	let name
+	fileName ? (name = fileName) : (name = new Date().getTime().toString() + ext)
+	const res = await client.put(name, file)
+
+	return { res, client, url: credentials.aliOSS_baseUrl + res.name }
+}
 
 async function createZip(fileName, files) {
 	const zip = new JSZip()
@@ -72,4 +112,13 @@ function transform(node, path = '', texts) {
 	texts.push({ path, text })
 }
 
-export { astToTextArr, textArrToAst, htmlToAst, astToHtml, downloadFile, createZip }
+export {
+	astToTextArr,
+	textArrToAst,
+	htmlToAst,
+	astToHtml,
+	downloadFile,
+	createZip,
+	upload,
+	uploadAliOSS,
+}

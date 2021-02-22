@@ -17,6 +17,7 @@ export class ComponentService {
       product: [],
       news: [],
       partner: [],
+      footer:[],
       other: [],
       plugins: [],
     }

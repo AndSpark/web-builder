@@ -24,6 +24,12 @@ export class CreateComponentDTO {
   @IsString()
   @ApiProperty()
   ast: JSON;
+
+    @ApiProperty()
+  styles: RefLink[];
+
+    @ApiProperty()
+  scripts: RefLink[];
 }
 
 export class CreateComponentBody {
@@ -65,6 +71,16 @@ export class UpdateComponentDTO {
   @IsOptional()
   @ApiProperty()
   ast: JSON;
+
+  @ApiProperty()
+  @IsOptional()
+    
+  styles: RefLink[];
+
+  @ApiProperty()
+  @IsOptional()
+      
+  scripts: RefLink[];
 }
 
 export class UpdateComponentBody {
@@ -85,6 +101,7 @@ export interface ComponentsListResponse {
     product: ComponentBaseInfo[];
     news: ComponentBaseInfo[];
     partner: ComponentBaseInfo[];
+    footer: ComponentBaseInfo[];
     other: ComponentBaseInfo[];
     plugins: ComponentBaseInfo[];
   }
@@ -98,4 +115,6 @@ export interface ComponentResponse {
   css: string;
   js: string;
   ast: JSON;
+  styles: RefLink[];
+  scripts: RefLink[];
 }

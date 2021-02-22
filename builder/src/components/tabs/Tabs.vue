@@ -17,9 +17,12 @@
 				:changeDialogStatus.sync="changeDialogStatus"
 				@replaceArea="replaceArea"
 			></change-dialog>
-			<option-dialog :optionDialogStatus.sync="optionDialogStatus"></option-dialog>
+			<option-dialog
+				:optionDialogStatus.sync="optionDialogStatus"
+				:totalRef="totalRef"
+			></option-dialog>
 			<v-toolbar flat color="primary" dark>
-				<v-toolbar-title>区域选项</v-toolbar-title>
+				<v-toolbar-title>组件选项</v-toolbar-title>
 				<v-spacer></v-spacer>
 				<v-icon large @click="addDialogStatus = true">mdi-plus-circle-outline</v-icon>
 			</v-toolbar>
@@ -69,40 +72,34 @@
 						{{ item.title }}
 					</v-expansion-panel-header>
 					<v-expansion-panel-content>
-						<v-sheet max-height="350" style="overflow-Y:auto">
+						<v-sheet max-height="250" style="overflow-Y:auto">
 							<v-text-field
 								v-for="(text, i) in astToTextArr(item.ast)"
 								:key="i"
 								:value="text.text"
 								@input="changeText(item, text, $event)"
 							></v-text-field>
-							<v-sheet class="d-flex">
-								<v-spacer></v-spacer>
-								<v-btn
-									class="mx-2"
-									dark
-									color="green"
-									small
-									@click="showChangeComponentDialog(item, i)"
-								>
-									<v-icon dark>
-										mdi-cached
-									</v-icon>
-									替换
-								</v-btn>
-								<v-btn
-									class="mx-2"
-									dark
-									color="cyan"
-									small
-									@click="showUpdateComponentDialog(item)"
-								>
-									<v-icon dark>
-										mdi-pencil
-									</v-icon>
-									编辑
-								</v-btn>
-							</v-sheet>
+						</v-sheet>
+						<v-sheet class="d-flex">
+							<v-spacer></v-spacer>
+							<v-btn
+								class="mx-2"
+								dark
+								color="green"
+								small
+								@click="showChangeComponentDialog(item, i)"
+							>
+								<v-icon dark>
+									mdi-cached
+								</v-icon>
+								替换
+							</v-btn>
+							<v-btn class="mx-2" dark color="cyan" small @click="showUpdateComponentDialog(item)">
+								<v-icon dark>
+									mdi-pencil
+								</v-icon>
+								编辑
+							</v-btn>
 						</v-sheet>
 					</v-expansion-panel-content>
 				</v-expansion-panel>
@@ -146,13 +143,30 @@ export default {
 			clearAble: true,
 		}
 	},
-	computed: {},
+	computed: {
+		totalRef() {
+			let refs = this.area.reduce(
+				(p, c) => {
+					if (c.styles && c.styles.length) p.styles.push(...c.styles)
+					if (c.scripts && c.scripts.length) p.scripts.push(...c.scripts)
+					return p
+				},
+				{ scripts: [], styles: [] }
+			)
+			refs.scripts = [...new Set(refs.scripts)]
+			refs.styles = [...new Set(refs.styles)]
+			return refs
+		},
+	},
 	created() {},
 	watch: {
 		optionDialogStatus(n) {
 			if (!n) {
 				this.$emit('updateOptions')
 			}
+		},
+		totalRef(n) {
+			this.$emit('updateOptions')
 		},
 	},
 	async mounted() {

@@ -3,7 +3,7 @@
 		<v-dialog v-model="changeDialogStatus" persistent max-width="400px">
 			<v-card>
 				<v-toolbar flat color="primary" dark>
-					<v-toolbar-title>替换区域</v-toolbar-title>
+					<v-toolbar-title>替换组件</v-toolbar-title>
 				</v-toolbar>
 				<v-tabs vertical>
 					<v-tab v-for="(content, category) in componentsList" :key="category">
@@ -58,7 +58,7 @@ export default {
 	name: 'changeDialog',
 	components: {},
 	props: {
-		cmponentsList: Object,
+		componentsList: Object,
 		selectComponentsList: Object,
 		changeDialogStatus: {
 			type: Boolean,

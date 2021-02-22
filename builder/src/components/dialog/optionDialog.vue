@@ -10,59 +10,111 @@
 					<span class="headline">修改配置</span>
 				</v-toolbar>
 				<v-card-text class="pt-2">
-					<v-row>
-						<v-col cols="4">
-							<v-text-field label="html文件名" v-model="options.htmlName"></v-text-field>
-						</v-col>
-						<v-col cols="4">
-							<v-text-field label="css文件名" v-model="options.cssName"></v-text-field>
-						</v-col>
-						<v-col cols="4">
-							<v-text-field label="js文件名" v-model="options.jsName"></v-text-field>
-						</v-col>
+					<v-sheet max-height="600" style="overflow-y:auto;">
+						<v-row class="mx-1">
+							<v-col cols="4">
+								<v-text-field label="html文件名" v-model="options.htmlName"></v-text-field>
+							</v-col>
+							<v-col cols="4">
+								<v-text-field label="css文件名" v-model="options.cssName"></v-text-field>
+							</v-col>
+							<v-col cols="4">
+								<v-text-field label="js文件名" v-model="options.jsName"></v-text-field>
+							</v-col>
 
-						<v-col cols="12" class="d-flex ">
-							<p class="text-subtitle-1 black--text">引用的style文件链接</p>
-							<v-spacer></v-spacer>
-							<v-btn small @click="addStyle"><v-icon>mdi-plus</v-icon> 添加</v-btn>
-						</v-col>
-						<!-- style列表 -->
-						<v-col
-							cols="12"
-							class="d-flex my-n5 align-center"
-							v-for="(style, i) in options.styles"
-							:key="'style' + i"
-						>
-							<v-checkbox class="text-h1" v-model="style.preload">
-								<template v-slot:label>
-									<v-subheader class="mx-n4">预加载</v-subheader>
-								</template>
-							</v-checkbox>
-							<v-text-field label="stylesheet" class="mx-4" v-model="style.link"></v-text-field>
-							<v-btn x-small fab @click="deleteStyle(i)"><v-icon>mdi-trash-can</v-icon> </v-btn>
-						</v-col>
+							<v-col cols="12" class="d-flex ">
+								<p class="text-subtitle-1 black--text">引用的style文件链接</p>
+								<v-spacer></v-spacer>
+								<v-btn small @click="uploadStyleOrScript('style')" class="mr-2"
+									><v-icon>mdi-cloud</v-icon> 上传</v-btn
+								>
+								<v-btn small @click="addStyle"><v-icon>mdi-plus</v-icon> 添加</v-btn>
+							</v-col>
+							<!-- style列表 -->
+							<v-col
+								cols="12"
+								class="d-flex my-n5 align-center"
+								v-for="(style, i) in options.styles"
+								:key="style + i"
+							>
+								<v-checkbox class="text-h1" v-model="style.preload">
+									<template v-slot:label>
+										<v-subheader class="mx-n4">预加载</v-subheader>
+									</template>
+								</v-checkbox>
+								<v-text-field label="stylesheet" class="mx-4" v-model="style.link"></v-text-field>
+								<v-btn x-small fab elevation="2" @click="deleteStyle(i)"
+									><v-icon>mdi-trash-can</v-icon>
+								</v-btn>
+							</v-col>
 
-						<v-col cols="12" class="d-flex ">
-							<p class="text-subtitle-1 black--text ">引用的script文件链接</p>
-							<v-spacer></v-spacer>
-							<v-btn small @click="addScript"><v-icon>mdi-plus</v-icon> 添加</v-btn>
-						</v-col>
-						<!-- script 列表 -->
-						<v-col
-							cols="12"
-							class="d-flex my-n5 align-center"
-							v-for="(script, i) in options.scripts"
-							:key="'script' + i"
-						>
-							<v-checkbox class="text-h1" v-model="script.preload">
-								<template v-slot:label>
-									<v-subheader class="mx-n4">预加载</v-subheader>
-								</template>
-							</v-checkbox>
-							<v-text-field label="script" class="mx-4" v-model="script.link"></v-text-field>
-							<v-btn x-small fab @click="deleteScript(i)"><v-icon>mdi-trash-can</v-icon> </v-btn>
-						</v-col>
-					</v-row>
+							<v-col
+								cols="12"
+								class="d-flex my-n5 align-center"
+								v-for="(style, i) in totalRef.styles"
+								:key="style + i"
+							>
+								<v-checkbox class="text-h1" disabled v-model="style.preload">
+									<template v-slot:label>
+										<v-subheader class="mx-n4">预加载</v-subheader>
+									</template>
+								</v-checkbox>
+								<v-text-field
+									label="来自组件"
+									disabled
+									class="mx-4"
+									:value="style.link"
+								></v-text-field>
+								<v-btn x-small fab elevation="2" disabled><v-icon>mdi-trash-can</v-icon> </v-btn>
+							</v-col>
+
+							<v-col cols="12" class="d-flex ">
+								<p class="text-subtitle-1 black--text ">引用的script文件链接</p>
+								<v-spacer></v-spacer>
+								<v-btn small @click="uploadStyleOrScript('script')" class="mr-2"
+									><v-icon>mdi-cloud</v-icon> 上传</v-btn
+								>
+								<v-btn small @click="addScript"><v-icon>mdi-plus</v-icon> 添加</v-btn>
+							</v-col>
+							<!-- script 列表 -->
+							<v-col
+								cols="12"
+								class="d-flex my-n5 align-center"
+								v-for="(script, i) in options.scripts"
+								:key="script + i"
+							>
+								<v-checkbox class="text-h1" v-model="script.preload">
+									<template v-slot:label>
+										<v-subheader class="mx-n4">预加载</v-subheader>
+									</template>
+								</v-checkbox>
+								<v-text-field label="script" class="mx-4" v-model="script.link"></v-text-field>
+								<v-btn x-small fab elevation="2" @click="deleteScript(i)"
+									><v-icon>mdi-trash-can</v-icon>
+								</v-btn>
+							</v-col>
+							<v-col
+								cols="12"
+								class="d-flex my-n5 align-center"
+								v-for="(script, i) in totalRef.scripts"
+								:key="script + i"
+							>
+								<v-checkbox class="text-h1" disabled v-model="script.preload">
+									<template v-slot:label>
+										<v-subheader class="mx-n4">预加载</v-subheader>
+									</template>
+								</v-checkbox>
+								<v-text-field
+									label="来自组件"
+									disabled
+									class="mx-4"
+									:value="script.link"
+								></v-text-field>
+								<v-btn x-small fab elevation="2" disabled><v-icon>mdi-trash-can</v-icon> </v-btn>
+							</v-col>
+						</v-row>
+					</v-sheet>
+
 					<v-row class="mt-5 mb-0 mr-1">
 						<v-spacer></v-spacer>
 						<v-btn color="blue darken-1" text @click="cancerOptions" class="mr-2">取消</v-btn>
@@ -75,6 +127,7 @@
 </template>
 
 <script>
+import { upload } from '@/tool/tool'
 export default {
 	name: 'optionDialog',
 	components: {},
@@ -83,6 +136,7 @@ export default {
 			type: Boolean,
 			default: false,
 		},
+		totalRef: Object,
 	},
 	data() {
 		return {
@@ -134,6 +188,24 @@ export default {
 			let optionsJSON = localStorage.getItem('options')
 			this.options = JSON.parse(optionsJSON)
 			this.$emit('update:optionDialogStatus', false)
+		},
+		async uploadStyleOrScript(type) {
+			try {
+				let { url } = await upload()
+				if (type === 'style') {
+					this.options.styles.push({
+						link: url,
+						preload: false,
+					})
+				} else if (type === 'script') {
+					this.options.scripts.push({
+						link: url,
+						preload: false,
+					})
+				}
+			} catch (error) {
+				alert(error)
+			}
 		},
 	},
 }

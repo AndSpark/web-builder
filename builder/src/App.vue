@@ -15,7 +15,7 @@
 		<v-app-bar app>
 			<v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
 
-			<v-toolbar-title>Application</v-toolbar-title>
+			<v-toolbar-title>网页组件</v-toolbar-title>
 		</v-app-bar>
 
 		<v-main>
@@ -140,7 +140,9 @@ export default {
 			createZip('test.zip', this.zipFiles)
 		},
 		styleHrefUpdate() {
+			let componentStyles = this.$refs.tabs.totalRef.styles
 			let { styles } = this.options
+			styles = [...new Set([...styles, ...componentStyles])]
 			if (styles.length) {
 				this.styleHref = styles.reduce((p, c) => {
 					return p + `<link rel="stylesheet" href="${c.link}">`
@@ -150,7 +152,9 @@ export default {
 			}
 		},
 		jsSrcUpdate() {
+			let componentScripts = this.$refs.tabs.totalRef.scripts
 			let { scripts } = this.options
+			scripts = [...new Set([...scripts, ...componentScripts])]
 			if (scripts.length) {
 				this.jsSrc = scripts.reduce((p, c) => {
 					return p + `<script src="${c.link}"><\/script>`
@@ -160,7 +164,11 @@ export default {
 			}
 		},
 		preloadUpdate() {
+			let { styles: componentStyles, scripts: componentScripts } = this.$refs.tabs.totalRef
 			let { styles, scripts } = this.options
+			scripts = [...new Set([...scripts, ...componentScripts])]
+			styles = [...new Set([...styles, ...componentStyles])]
+
 			let stylesPreload = ''
 			let sripctsPreload = ''
 			if (styles.length) {
@@ -204,6 +212,7 @@ export default {
 <style>
 ::-webkit-scrollbar {
 	/*滚动条整体样式*/
+	display: none;
 	width: 4px;
 	/*高宽分别对应横竖滚动条的尺寸*/
 	height: 1px;

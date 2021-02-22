@@ -23,6 +23,12 @@ export class ComponentEntity extends AbstractEntity {
   @Column()
   ast: JSON;
 
+  @Column()
+  styles: RefLink[];
+
+  @Column()
+  scripts: RefLink[];
+
   toObj():ComponentResponse {
     return  <ComponentResponse>classToPlain(this)
   }
